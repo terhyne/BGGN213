@@ -1,0 +1,38 @@
+---
+title: "RMarkdown Demo"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Level 2 Heading
+
+I can write any *text* (italic) notes for **myself** (bold).
+
+I can insert code (R, Python, etc.) with the **green C button**. I can run the code chunk with the **green play button**. I can **knit** the file to produce an output (html, PDF, etc.).
+
+Example:
+
+```{r}
+plot(1:10, col="blue")
+```
+
+## Class 6
+
+Today we learned about this and that.
+
+Here's my code:
+```{r}
+mtcars
+library(ggplot2)
+ggplot(mtcars) + aes(mpg, disp) + geom_point() + geom_smooth()
+```
+
+Here are my notes:
+
+YAY!
+

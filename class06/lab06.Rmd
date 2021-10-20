@@ -1,0 +1,181 @@
+---
+title: "Lab 6: R functions"
+date: 10/20/21
+output: html_document
+---
+Here we will write a function to grade some student homework. We will start with a simple input example - vectors of student scores.
+
+```{r}
+student1 <- c(100, 100, 100, 100, 100, 100, 100, 90)
+student2 <- c(100, NA, 90, 90, 90, 90, 97, 80)
+student3 <- c(90, NA, NA, NA, NA, NA, NA, NA)
+```
+
+Q1: Write a function grade() to **determine an overall grade from a vector of student homework assignment scores, dropping the lowest single score**. If a student misses a homework (i.e. has an NA value), this can be used as a score to be potentially dropped. Your final function should be adquately explained with code comments and be able to work on an example class gradebook such as this one in CSV format: “https://tinyurl.com/gradeinput”. 
+
+```{r}
+student1
+```
+```{r}
+# find the average score
+mean(student1)
+```
+```{r}
+# find the lowest score
+min(student1)
+```
+Identifying 90 isn't very helpful. Let's check ?min.
+```{r}
+?min
+# aside from usage/arguments, "see also" is very helpful.
+# which.min identifies the position of the min.
+which.min(student1)
+```
+This means that the lowest score is in the 8th position of the vector. Better!
+
+Let's think about how to get rid of the 8th position.
+```{r}
+student1[1]
+# the brackets give the value of a particular position
+student1[-8]
+# minus 8 = all positions excepts for 8
+student1[1:7]
+# this gives the same result, but is harder to generalize
+```
+
+So, to get everything but the min value...
+```{r}
+student1[-which.min(student1)]
+# this says "from the student 1 vector, pull out all positions except for the position of the minimum value"
+# remember to use which.min (position), not min (value)
+```
+
+Now just take the average:
+```{r}
+mean(student1[-which.min(student1)])
+```
+Voila! This is my first solution / "code snippet".
+
+Let's try student 2:
+```{r}
+student2
+mean(student2[-which.min(student2)])
+```
+They missed a homework, and that messes things up. Argue.
+```{r}
+mean(student2, na.rm=TRUE)
+```
+Why isn't this fair?
+This ignores the fact that they missed a homework. The minimum value (not NA) will still be dropped. There are no consequences for missing one (or more!) homework assignments.
+
+Ideas for how to fix this?
+Change NA -> 0. Maybe a "if-then" statement...? How do I do this?
+Google says "is.na()" function.
+```{r}
+is.na(student2)
+```
+I want "true" to be 0.
+```{r}
+student2[is.na(student2)]
+# this just pulls out the "true" value, but we want to change that value to 0
+student2[is.na(student2)] <- 0
+# let's see if that worked
+student2
+```
+Beautiful. This tells R to pull out NA values and change them to 0.
+```{r}
+student2
+mean(student2[-which.min(student2)])
+# let's check that 0 was counted as the minimum and dropped
+mean(student2[-2])
+# same answer
+mean(student2)
+# without the minimum dropped
+```
+NOW it's fair!
+
+Next task is to (1) combine working snippets and (2) make it generalizable to all students
+
+Snippets:
+student2[is.na(student2)] <- 0
+mean(student2[-which.min(student2)])
+
+```{r}
+# replace "student2" with x
+x <- student2
+x[is.na(x)] <- 0
+mean(x[-which.min(x)])
+```
+Now x can be changed for the different students.
+```{r}
+x <- student1
+x[is.na(x)] <- 0
+mean(x[-which.min(x)])
+
+x <- student3
+x[is.na(x)] <- 0
+mean(x[-which.min(x)])
+```
+ ## Now we can write a function!
+ 
+We will take our working chunk and make it a function.
+But first - there's a shortcut! Highlight the chunk, go to "code" -> "extract function." Let's see what is gives us.
+ 
+```{r}
+grade <- function(x) {
+  x[is.na(x)] <- 0
+  mean(x[-which.min(x)])
+}
+# remember that you can't use this until you source it
+# you can also go to "Code" -> "insert Roxygen skeleton" to make a "?grade" description of your function.
+
+# always good to include comments
+grade <- function(x) {
+  # Map NA missing homework values to zero.
+  x[is.na(x)] <- 0
+  # Take the average score, dropping the minimum.
+  mean(x[-which.min(x)])
+}
+```
+ 
+Now we can use it!
+```{r}
+grade(student1)
+grade(student2)
+grade(student3)
+```
+
+Now grade the whole class. Use the gradebook.
+```{r}
+url <-  "https://tinyurl.com/gradeinput"
+# it's a csv file
+gradebook <- read.csv(url)
+gradebook
+# notice that it generated a data tab
+```
+Problem with the generated dataframe: I want students to be the row name, and HW1 to be the first column (not students as the first column).
+```{r}
+gradebook <- read.csv(url, row.names=1)
+# remember that dataframe numbers/vectors/etc. are columns
+gradebook
+```
+That worked!
+
+
+
+## Class 7 - additional challenge
+
+Make dropping the lowest score optional.
+
+```{r}
+grade2 <- function(x, drop.lowest=TRUE) 
+  x[is.na(x)] <- 0
+  if(drop.lowest) {
+  mean(x[-which.min(x)])
+} else {
+  mean(x)
+}
+```
+
+
+
