@@ -160,7 +160,12 @@ gradebook <- read.csv(url, row.names=1)
 gradebook
 ```
 That worked!
-Git test.
+
+## Side note: Git test
+Added to GitHub.
+Note: can change Rmd output to Github_document.
+
+
 
 
 
